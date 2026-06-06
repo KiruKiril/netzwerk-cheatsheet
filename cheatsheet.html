@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NB1 Netzwerk-Cheatsheet</title>
+<style>
+/* ===== BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f1117;
+  --bg2: #1a1d27;
+  --bg3: #252836;
+  --border: #2e3347;
+  --accent: #5b8dee;
+  --accent2: #7c5cbf;
+  --green: #27ae60;
+  --red: #e74c3c;
+  --yellow: #f39c12;
+  --text: #dce1f0;
+  --text2: #8892a4;
+  --code-bg: #0d1117;
+  --code-text: #a8d8a8;
+  --radius: 8px;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* ===== HEADER / SEARCH ===== */
+#header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg2);
+  border-bottom: 2px solid var(--accent);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+#header h1 {
+  font-size: 18px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+#search {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+#search:focus { border-color: var(--accent); }
+#search-count {
+  font-size: 12px;
+  color: var(--text2);
+  white-space: nowrap;
+}
+#btn-expand-all, #btn-collapse-all {
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+}
+#btn-expand-all:hover, #btn-collapse-all:hover { border-color: var(--accent); }
+
+/* ===== LAYOUT ===== */
+#layout {
+  display: flex;
+  gap: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+#toc-panel {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 58px;
+  height: calc(100vh - 58px);
+  overflow-y: auto;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+}
+#toc-panel h2 { font-size: 11px; text-transform: uppercase; color: var(--text2); letter-spacing: 1px; margin-bottom: 10px; }
+#toc-list { list-style: none; }
+#toc-list li { margin: 2px 0; }
+#toc-list a {
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 12px;
+  line-height: 1.4;
+}
+#toc-list a:hover { background: var(--bg3); color: var(--text); }
+#toc-list .toc-section { font-size: 11px; color: var(--accent); font-weight: bold; margin-top: 10px; padding: 2px 8px; }
+
+/* ===== MAIN CONTENT ===== */
+#main { flex: 1; padding: 20px; min-width: 0; }
+
+/* ===== KEYWORD TABLE ===== */
+#keyword-table {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+#keyword-table h2 { font-size: 14px; color: var(--accent); margin-bottom: 12px; }
+#keyword-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+#keyword-table th { text-align: left; padding: 4px 8px; color: var(--text2); border-bottom: 1px solid var(--border); }
+#keyword-table td { padding: 3px 8px; border-bottom: 1px solid var(--border); }
+#keyword-table td a { color: var(--accent); text-decoration: none; }
+#keyword-table td a:hover { text-decoration: underline; }
+
+/* ===== SECTION BLOCKS ===== */
+.section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.section.hidden { display: none; }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+.section-header:hover { background: #2d3248; }
+.section-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.badge-basic { background: #1a3a5c; color: #5b8dee; }
+.badge-adv   { background: #3a1a5c; color: #a07de8; }
+.badge-layer { background: #1a3a2a; color: #27ae60; }
+.badge-pruef { background: #3a2a1a; color: #f39c12; }
+.section-title { font-size: 15px; font-weight: 600; flex: 1; }
+.section-arrow { color: var(--text2); font-size: 12px; transition: transform 0.2s; }
+.section.open .section-arrow { transform: rotate(90deg); }
+.section-parent { font-size: 11px; color: var(--text2); }
+
+.section-body {
+  display: none;
+  padding: 16px;
+}
+.section.open .section-body { display: block; }
+
+/* ===== CONTENT INSIDE SECTIONS ===== */
+.section-body h3 {
+  font-size: 13px;
+  color: var(--accent);
+  margin: 16px 0 6px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+.section-body h3:first-child { margin-top: 0; }
+.section-body p { color: var(--text); margin-bottom: 8px; font-size: 13px; }
+.section-body ul { padding-left: 18px; margin-bottom: 10px; }
+.section-body li { margin: 2px 0; font-size: 13px; }
+.section-body ol { padding-left: 18px; }
+.note {
+  background: #1a2a3a;
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+  margin: 10px 0;
+  font-size: 12px;
+  color: var(--text2);
+}
+.warn {
+  background: #2a1a1a;
+  border-left: 3px solid var(--red);
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+  margin: 10px 0;
+  font-size: 12px;
+}
+.success {
+  background: #1a2a1a;
+  border-left: 3px solid var(--green);
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+/* ===== TABLE ===== */
+.data-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+.data-table th { background: var(--bg3); text-align: left; padding: 6px 10px; border: 1px solid var(--border); color: var(--accent); font-size: 11px; }
+.data-table td { padding: 5px 10px; border: 1px solid var(--border); }
+.data-table tr:nth-child(even) td { background: #1c1f2e; }
+
+/* ===== CODE BLOCKS ===== */
+.cmd-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+.cmd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  background: #161b22;
+  border-bottom: 1px solid var(--border);
+}
+.cmd-desc { font-size: 11px; color: var(--text2); }
+.copy-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 8px;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+.cmd-code {
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--code-text);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.placeholder { color: #e8a87c; font-style: italic; }
+
+/* ===== OSI MODEL VISUAL ===== */
+.osi-grid { display: grid; grid-template-columns: 40px 1fr 1fr 1fr; gap: 2px; margin: 10px 0; }
+.osi-cell { padding: 6px 10px; border-radius: 4px; font-size: 12px; }
+.osi-num  { background: var(--bg3); text-align: center; font-weight: bold; color: var(--text2); }
+.osi-de   { background: #1a2a3a; }
+.osi-en   { background: #1a3a2a; }
+.osi-pdu  { background: #2a1a3a; font-family: var(--font-mono); font-size: 11px; color: #a07de8; }
+.osi-header { font-size: 11px; color: var(--text2); font-weight: bold; }
+
+/* ===== SUBNET TABLE ===== */
+.subnet-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; font-family: var(--font-mono); }
+.subnet-table th { background: var(--bg3); padding: 5px 8px; border: 1px solid var(--border); color: var(--accent); text-align: center; }
+.subnet-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+.subnet-table tr:nth-child(even) td { background: #1c1f2e; }
+
+/* ===== CONTROL LIST ===== */
+#control-list { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 24px; }
+#control-list h2 { font-size: 14px; color: var(--yellow); margin-bottom: 12px; }
+.status-ok   { color: var(--green); }
+.status-warn { color: var(--yellow); }
+
+/* ===== PRINT ===== */
+@media print {
+  #header, #toc-panel, .copy-btn, #btn-expand-all, #btn-collapse-all { display: none !important; }
+  body { background: white; color: black; font-size: 11px; }
+  #layout { display: block; }
+  #main { padding: 0; }
+  .section { border: 1px solid #ccc; margin-bottom: 10px; break-inside: avoid; }
+  .section-body { display: block !important; }
+  .section-header { background: #f0f0f0; }
+  .section-title { color: #003399; }
+  .cmd-code { background: #f8f8f8; color: #006600; border: 1px solid #ccc; font-size: 10px; }
+  .cmd-block { border: 1px solid #ccc; }
+  #keyword-table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- STICKY HEADER -->
+<div id="header">
+  <h1>&#9889; NB1 Netzwerk-Cheatsheet</h1>
+  <input type="text" id="search" placeholder="Suchen&#8230; (z.B. ospf, vlan, arp, dhcp)" autocomplete="off">
+  <span id="search-count"></span>
+  <button id="btn-expand-all">Alle aufklappen</button>
+  <button id="btn-collapse-all">Alle zuklappen</button>
+</div>
+
+<div id="layout">
+
+<!-- TOC SIDEBAR -->
+<nav id="toc-panel">
+  <h2>Inhaltsverzeichnis</h2>
+  <ul id="toc-list">
+    <li><span class="toc-section">Grundlagen</span></li>
+    <li><a href="#s-netzkarten">Netzwerkkarten</a></li>
+    <li><a href="#s-ipaddr">IP Adressierung</a></li>
+    <li><a href="#s-osimodel">OSI &amp; TCP/IP Modell</a></li>
+    <li><a href="#s-wireshark">Wireshark</a></li>
+    <li><a href="#s-protokolle">Protokolle (DHCP)</a></li>
+    <li><a href="#s-fehlersuche0">Fehlersuche Grundlagen</a></li>
+    <li><span class="toc-section">OSI Layer 1</span></li>
+    <li><a href="#s-layer1">Layer 1 &#8211; Physical</a></li>
+    <li><span class="toc-section">OSI Layer 2</span></li>
+    <li><a href="#s-arp">ARP</a></li>
+    <li><a href="#s-vlan">VLAN &amp; Trunk</a></li>
+    <li><a href="#s-8021q">IEEE 802.1q</a></li>
+    <li><a href="#s-stp">Spanning Tree</a></li>
+    <li><a href="#s-etherchannel">Etherchannel</a></li>
+    <li><a href="#s-fehlersuche2">Fehlersuche L1/L2</a></li>
+    <li><span class="toc-section">OSI Layer 3</span></li>
+    <li><a href="#s-subnetting">Subnetting VLSM</a></li>
+    <li><a href="#s-ippaket">IP Paket Aufbau</a></li>
+    <li><a href="#s-cmds">Standard Befehle</a></li>
+    <li><a href="#s-statrouting">Statisches Routing</a></li>
+    <li><a href="#s-rip">RIP</a></li>
+    <li><a href="#s-ospf">OSPF</a></li>
+    <li><a href="#s-vyos">vyOS Router</a></li>
+    <li><span class="toc-section">OSI Layer 4&#8211;7</span></li>
+    <li><a href="#s-tcpudp">TCP / UDP</a></li>
+    <li><a href="#s-dhcp">DHCP &amp; DNS</a></li>
+    <li><a href="#s-dhcprelay">DHCP Relay</a></li>
+    <li><span class="toc-section">Pruefungsvorbereitung</span></li>
+    <li><a href="#s-pruef1">Teil 1 &#8211; Inter-VLAN</a></li>
+    <li><a href="#s-kontroll">Kontrollliste</a></li>
+  </ul>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+
+<!-- KEYWORD TABLE -->
+<div id="keyword-table">
+  <h2>&#128269; Schnell-Index: Stichwort &#8594; Abschnitt</h2>
+  <table>
+    <tr><th>Stichwort</th><th>Abschnitt</th><th>Stichwort</th><th>Abschnitt</th></tr>
+    <tr><td>ip addr / ipconfig</td><td><a href="#s-cmds">Standard Befehle</a></td><td>arp -a / arp -d</td><td><a href="#s-arp">ARP</a></td></tr>
+    <tr><td>ping / traceroute</td><td><a href="#s-cmds">Standard Befehle</a></td><td>VLAN / Trunk</td><td><a href="#s-vlan">VLAN &amp; Trunk</a></td></tr>
+    <tr><td>OSPF / router ospf</td><td><a href="#s-ospf">OSPF</a></td><td>STP / spanning-tree</td><td><a href="#s-stp">Spanning Tree</a></td></tr>
+    <tr><td>ip route / ip helper</td><td><a href="#s-statrouting">Statisches Routing</a></td><td>DHCP / ipconfig /renew</td><td><a href="#s-dhcp">DHCP &amp; DNS</a></td></tr>
+    <tr><td>netplan / vyOS</td><td><a href="#s-vyos">vyOS Router</a></td><td>Subnetting / /26 /25</td><td><a href="#s-subnetting">Subnetting</a></td></tr>
+    <tr><td>Wireshark Filter</td><td><a href="#s-wireshark">Wireshark</a></td><td>Inter-VLAN / dot1Q</td><td><a href="#s-pruef1">Pruefung Teil 1</a></td></tr>
+    <tr><td>OSI Schichten</td><td><a href="#s-osimodel">OSI Modell</a></td><td>show ip ospf neighbor</td><td><a href="#s-ospf">OSPF</a></td></tr>
+    <tr><td>encapsulation dot1Q</td><td><a href="#s-8021q">802.1q</a></td><td>show mac address-table</td><td><a href="#s-arp">ARP Tabelle</a></td></tr>
+  </table>
+</div>
+
+<!-- ===== GRUNDLAGEN ===== -->
+
+<div class="section open" id="s-netzkarten">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">Netzwerkkarten aendern</span>
+    <span class="section-parent">Grundlagen</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>Windows (vmWP1) &#8211; IP aendern</h3>
+    <p>Einstellungen &#8594; Netzwerk &#8594; Netzwerkkarte &#8594; Bearbeiten<br>
+    Alte IP: <code>192.168.110.10</code> &#8594; Neue IP: <code>192.168.110.100</code></p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">IP-Konfiguration anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ipconfig /all</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Internetverbindung pruefen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ping gibb.ch</div>
+    </div>
+
+    <h3>Linux Ubuntu (vmLS1) &#8211; IP aendern</h3>
+    <p>Alte IP: <code>192.168.110.11</code> &#8594; Neue IP: <code>192.168.110.110</code></p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">YAML-Konfigurationsdatei bearbeiten</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">sudo nano /etc/netplan/00-eth0.yaml</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Neue Netzwerkkonfiguration aktivieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">sudo netplan apply</div>
+    </div>
+
+    <h3>vyOS Router (vmLR1) &#8211; Interfaces konfigurieren</h3>
+    <p>Login: Account <code>vyos</code> | MAC: LAN1 = <code>00:50:56:01:24:01</code>, LAN2 = <code>00:50:56:02:24:01</code></p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Aktuelle Konfiguration anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show config</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">In Konfigurationsmodus wechseln (Prompt: #)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">config</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">IP auf Interface setzen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">set interfaces ethernet <span class="placeholder">&lt;eth1&gt;</span> address <span class="placeholder">&lt;192.168.111.1/24&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Aenderungen aktivieren + speichern</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">commit
+save</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Interfaces anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show interfaces</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Falsche Konfig loeschen + Modus verlassen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">delete interfaces ethernet <span class="placeholder">&lt;eth1&gt;</span> address <span class="placeholder">&lt;192.168.111.1/24&gt;</span>
+exit</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-ipaddr">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">IP Adressierung &amp; Subnetting (Grundlagen)</span>
+    <span class="section-parent">Grundlagen</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>Subnetzmasken-Referenz</h3>
+    <table class="subnet-table">
+      <tr><th>Praefix</th><th>Maske</th><th>Hosts</th><th>Bloecke</th></tr>
+      <tr><td>/24</td><td>255.255.255.0</td><td>254</td><td>256</td></tr>
+      <tr><td>/25</td><td>255.255.255.128</td><td>126</td><td>128</td></tr>
+      <tr><td>/26</td><td>255.255.255.192</td><td>62</td><td>64</td></tr>
+      <tr><td>/27</td><td>255.255.255.224</td><td>30</td><td>32</td></tr>
+      <tr><td>/28</td><td>255.255.255.240</td><td>14</td><td>16</td></tr>
+      <tr><td>/29</td><td>255.255.255.248</td><td>6</td><td>8</td></tr>
+      <tr><td>/30</td><td>255.255.255.252</td><td>2</td><td>4</td></tr>
+    </table>
+    <h3>Subnetting-Vorgehen</h3>
+    <ul>
+      <li>Formel Hosts: 2^(32&#8722;Praefix) &#8722; 2</li>
+      <li>Gateway = Netzadresse + 1 (erster Host)</li>
+      <li>Broadcast = Netzadresse + Blockgroesse &#8722; 1</li>
+      <li>Naechstes Netz = Broadcast + 1</li>
+    </ul>
+    <h3>Beispiel &#8211; 192.168.1.0/24 &#8594; 3 VLANs (aus Aufgabe)</h3>
+    <table class="data-table">
+      <tr><th>VLAN</th><th>Netz</th><th>Maske</th><th>Gateway</th><th>1. Host</th></tr>
+      <tr><td>VLAN 1 Server</td><td>192.168.1.0/24</td><td>255.255.255.0</td><td>192.168.1.1</td><td>192.168.1.2</td></tr>
+      <tr><td>VLAN 2 IoT</td><td>192.168.2.0/24</td><td>255.255.255.0</td><td>192.168.2.1</td><td>192.168.2.2</td></tr>
+      <tr><td>VLAN 3 User</td><td>192.168.3.0/24</td><td>255.255.255.0</td><td>192.168.3.1</td><td>192.168.3.2</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section open" id="s-osimodel">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">OSI- und TCP/IP Modell</span>
+    <span class="section-parent">Grundlagen</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>ISO/OSI Modell &#8211; Alle 7 Schichten</h3>
+    <div class="osi-grid">
+      <div class="osi-cell osi-num osi-header">#</div>
+      <div class="osi-cell osi-de osi-header">Deutsch</div>
+      <div class="osi-cell osi-en osi-header">Englisch</div>
+      <div class="osi-cell osi-pdu osi-header">PDU</div>
+      <div class="osi-cell osi-num">7</div><div class="osi-cell osi-de">Anwendungsschicht</div><div class="osi-cell osi-en">Application Layer</div><div class="osi-cell osi-pdu">Daten</div>
+      <div class="osi-cell osi-num">6</div><div class="osi-cell osi-de">Darstellungsschicht</div><div class="osi-cell osi-en">Presentation Layer</div><div class="osi-cell osi-pdu">Daten</div>
+      <div class="osi-cell osi-num">5</div><div class="osi-cell osi-de">Sitzungsschicht</div><div class="osi-cell osi-en">Session Layer</div><div class="osi-cell osi-pdu">Daten</div>
+      <div class="osi-cell osi-num" style="color:#e8a87c">4</div><div class="osi-cell osi-de">Transportschicht</div><div class="osi-cell osi-en">Transport Layer</div><div class="osi-cell osi-pdu">Segment</div>
+      <div class="osi-cell osi-num" style="color:#5b8dee">3</div><div class="osi-cell osi-de">Vermittlungsschicht</div><div class="osi-cell osi-en">Network Layer</div><div class="osi-cell osi-pdu">Paket</div>
+      <div class="osi-cell osi-num" style="color:#27ae60">2</div><div class="osi-cell osi-de">Sicherungsschicht</div><div class="osi-cell osi-en">Data Link Layer</div><div class="osi-cell osi-pdu">Frame</div>
+      <div class="osi-cell osi-num" style="color:#e74c3c">1</div><div class="osi-cell osi-de">Bituebertragungsschicht</div><div class="osi-cell osi-en">Physical Layer</div><div class="osi-cell osi-pdu">Bit</div>
+    </div>
+    <h3>TCP/IP Modell (4 Schichten)</h3>
+    <table class="data-table">
+      <tr><th>TCP/IP Schicht</th><th>OSI Schichten</th><th>Beispiele</th></tr>
+      <tr><td>4 Anwendungsschicht</td><td>5 + 6 + 7</td><td>HTTP, DNS, DHCP, SMTP, FTP</td></tr>
+      <tr><td>3 Transportschicht</td><td>4</td><td>TCP, UDP</td></tr>
+      <tr><td>2 Internetschicht</td><td>3</td><td>IP, ICMP, ARP (logisch)</td></tr>
+      <tr><td>1 Netzzugangsschicht</td><td>1 + 2</td><td>Ethernet, WLAN, MAC, ARP</td></tr>
+    </table>
+    <h3>Layer-Zuordnung (Pruefungsfragen)</h3>
+    <table class="data-table">
+      <tr><th>Layer</th><th>Konzepte/Protokolle</th></tr>
+      <tr><td>Layer 1</td><td>RJ45 Kabel, Glasfaserkabel, Bits (01010&#8230;), Portspeed, Duplex</td></tr>
+      <tr><td>Layer 2</td><td>MAC-Adresse (z.B. 4C:1D:96:A1:AF:A9), ARP, Ethernet, Switch, Frame, VLAN</td></tr>
+      <tr><td>Layer 3</td><td>IP-Adresse, Subnetzmaske (255.255.255.0), Router, Paket, OSPF, RIP</td></tr>
+      <tr><td>Layer 4</td><td>TCP, UDP, Segment, Port-Nummern</td></tr>
+      <tr><td>Layer 5&#8211;7</td><td>https, DNS, DHCP, HTTP, FTP, SMTP, Anwendungen</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s-wireshark">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC/ADV</span>
+    <span class="section-title">Wireshark Analyse</span>
+    <span class="section-parent">Grundlagen</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>Tools</h3>
+    <ul>
+      <li><strong>Wireshark</strong>: GUI-Protokollanalysator (Windows/Linux, kostenlos)</li>
+      <li><strong>tshark</strong>: Kommandozeilenversion von Wireshark</li>
+      <li><strong>tcpdump</strong>: Aufzeichnung auf OPNsense/Firewall (kein tshark verfuegbar)</li>
+    </ul>
+    <div class="warn">&#9888;&#65039; Einsatz nur mit Zustimmung der ueberwachten Personen! Sonst &#8594; Verletzung des Persoenlichkeitsrechts.</div>
+    <h3>Wireshark Display-Filter (pruefungsrelevant)</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">DHCP-Pakete filtern</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">dhcp</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">ARP-Pakete</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">arp</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">ICMP (Ping)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">icmp</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">TCP-Traffic auf Port 80 (HTTP)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">tcp.port == 80</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">HTTPS-Traffic</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">tcp.port == 443</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Pakete von/zu bestimmter IP</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ip.addr == <span class="placeholder">&lt;192.168.110.10&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Nur Quell-IP filtern</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ip.src == <span class="placeholder">&lt;192.168.110.10&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Nur Ziel-IP filtern</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ip.dst == <span class="placeholder">&lt;192.168.110.10&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Pakete von/zu MAC-Adresse</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">eth.addr == <span class="placeholder">&lt;4c:1d:96:a1:af:a9&gt;</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-protokolle">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">Protokolle &#8211; DHCP Analyse</span>
+    <span class="section-parent">Grundlagen</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>DHCP DORA-Ablauf</h3>
+    <table class="data-table">
+      <tr><th>Schritt</th><th>Richtung</th><th>Nachricht</th><th>Typ</th></tr>
+      <tr><td>1</td><td>Client &#8594; Broadcast</td><td>DISCOVER</td><td>UDP Broadcast</td></tr>
+      <tr><td>2</td><td>Server &#8594; Client</td><td>OFFER</td><td>UDP</td></tr>
+      <tr><td>3</td><td>Client &#8594; Broadcast</td><td>REQUEST</td><td>UDP Broadcast</td></tr>
+      <tr><td>4</td><td>Server &#8594; Client</td><td>ACK</td><td>UDP</td></tr>
+    </table>
+    <div class="success">&#10003; DHCP Request ist UDP &#8211; NICHT TCP!</div>
+    <h3>Wireshark DHCP-Analyse-Fragen</h3>
+    <ul>
+      <li>Welche IP hat der DHCP-Server vergeben? &#8594; OFFER/ACK Paket &#8594; &#8222;Your IP&#8220;</li>
+      <li>Default Gateway? &#8594; Option 3 im DHCP-Paket</li>
+      <li>MAC des Windows PC? &#8594; Ethernet-Header, Source MAC</li>
+      <li>Leasetime? &#8594; Option 51 im DHCP-Paket (in Sekunden &#8594; &#247;3600 = Stunden)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section" id="s-fehlersuche0">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">Fehlersuche Grundlagen (Netzwerkkarten/DNS/DHCP)</span>
+    <span class="section-parent">Grundlagen</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <div class="note">Fehler befinden sich NUR auf Netzwerkkarten/DHCP/DNS &#8211; NICHT auf Routern/Switches. SOLL-Zustand = Notizen im Layout.</div>
+    <h3>Checkliste bei Ping-Fehlern (OSI Bottom-Up)</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">1. Lokale NIC testen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ping 127.0.0.1</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">2. Eigene IP anzeigen / pruefen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ipconfig /all</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">3. Default Gateway erreichbar?</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ping <span class="placeholder">&lt;default-gateway-ip&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">4. Ziel-IP erreichbar?</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ping <span class="placeholder">&lt;ziel-ip&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">5. Hostname aufloesbar? (DNS-Check)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">nslookup <span class="placeholder">&lt;hostname&gt;</span>
+ping <span class="placeholder">&lt;hostname&gt;</span></div>
+    </div>
+    <h3>Haeufige Fehlerquellen</h3>
+    <table class="data-table">
+      <tr><th>Symptom</th><th>Wahrscheinliche Ursache</th></tr>
+      <tr><td>Ping an GW schlaegt fehl</td><td>Falsche IP / Subnetzmaske / Gateway auf NIC</td></tr>
+      <tr><td>Kein Internetzugriff</td><td>Falscher/fehlender DNS-Server</td></tr>
+      <tr><td>DNS-Name nicht aufloesbar</td><td>DNS-Server falsch konfiguriert / nicht erreichbar</td></tr>
+      <tr><td>Kein DHCP-Lease</td><td>DHCP-Server nicht aktiv / DHCP Relay fehlt</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== OSI LAYER 1 ===== -->
+
+<div class="section" id="s-layer1">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-layer">L1</span>
+    <span class="section-title">OSI Layer 1 &#8211; Physical (Kabel, Stecker, Glasfaser)</span>
+    <span class="section-parent">OSI Layer 1</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>Kabel-Typen</h3>
+    <table class="data-table">
+      <tr><th>Typ</th><th>Beschreibung</th></tr>
+      <tr><td>UTP (Unshielded)</td><td>Keine Abschirmung, guenstig, normale Bueroumgebung</td></tr>
+      <tr><td>STP (Shielded)</td><td>Aluminium-Mantel um verdrillte Kabelpaare, schuetzt vor elektr. Stoerungen</td></tr>
+    </table>
+    <h3>10Base-T vs 1000Base-T</h3>
+    <table class="data-table">
+      <tr><th>Standard</th><th>Aderpaare</th><th>Richtung</th></tr>
+      <tr><td>10Base-T</td><td>2 Paare</td><td>1 Senden, 1 Empfangen</td></tr>
+      <tr><td>1000Base-T</td><td>4 Paare</td><td>Alle 4 gleichzeitig (Full Duplex &#8594; hoehere Bandbreite)</td></tr>
+    </table>
+    <h3>Glasfaser</h3>
+    <table class="data-table">
+      <tr><th>Typ</th><th>Kern-&#216;</th><th>Distanz</th><th>Einsatz</th></tr>
+      <tr><td>Singlemode (SM)</td><td>~9 um</td><td>bis km</td><td>Weitverkehr, WAN</td></tr>
+      <tr><td>Multimode (MM)</td><td>50/62,5 um</td><td>bis ~550m</td><td>Gebaeude, LAN</td></tr>
+    </table>
+    <div class="warn">&#9888;&#65039; Biegeradius beachten! Verschiedene Steckverbindungen (LC, SC, ST) muessen kompatibel sein.</div>
+    <h3>IEEE-Standard Wahl</h3>
+    <p>Einflussfaktoren: <strong>Bandbreite</strong> + <strong>Distanz</strong> + <strong>Medium</strong> (Kupfer/Glas) + Netzwerkkarten</p>
+    <h3>Konfigurierbare Layer-1-Parameter (Netzwerkkarte)</h3>
+    <div class="success">&#10003; Portspeed (10/100/1000 Mbit/s) | Full-Duplex / Half-Duplex | Auto-Negotiation</div>
+    <div class="warn">&#10007; NICHT: IP-Adresse, MAC-Adresse, VLAN &#8594; das sind Layer 2/3!</div>
+  </div>
+</div>
+
+<!-- ===== OSI LAYER 2 ===== -->
+
+<div class="section" id="s-arp">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-layer">L2</span>
+    <span class="section-title">ARP &#8211; Address Resolution Protocol</span>
+    <span class="section-parent">OSI Layer 2</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Zweck:</strong> IP-Adresse &#8594; MAC-Adresse aufloesen (Layer 2 Broadcast)</p>
+    <h3>ARP-Ablauf</h3>
+    <table class="data-table">
+      <tr><th>Schritt</th><th>Typ</th><th>Inhalt</th></tr>
+      <tr><td>1. ARP Request</td><td>Broadcast</td><td>Wer hat IP x.x.x.x? Sende mir deine MAC! Dest-MAC: ff:ff:ff:ff:ff:ff</td></tr>
+      <tr><td>2. ARP Reply</td><td>Unicast</td><td>Ich habe diese IP, meine MAC ist xx:xx:xx:xx:xx:xx</td></tr>
+    </table>
+    <h3>ARP-Befehle</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">ARP-Tabelle anzeigen (Windows + Linux)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">arp -a</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">ARP-Tabelle loeschen (Windows)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">arp -d</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">ARP-Tabelle loeschen (Linux)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">sudo ip -s -s neigh flush all</div>
+    </div>
+    <h3>Cisco Switch &#8211; MAC-Tabelle</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">MAC-Adresstabelle anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show mac address-table</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">In Privileged Mode (noetig zum Loeschen)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">enable</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">MAC-Tabelle loeschen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">clear mac address-table dynamic</div>
+    </div>
+    <div class="note">Wireshark-Filter: <code>arp</code></div>
+  </div>
+</div>
+
+<div class="section" id="s-vlan">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-layer">L2</span>
+    <span class="section-title">VLAN &amp; Trunk Ports</span>
+    <span class="section-parent">OSI Layer 2</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p><strong>VLAN</strong> = Virtual LAN &#8211; logische Netzwerktrennung auf Layer 2. PCs in verschiedenen VLANs koennen NICHT direkt pingen (ohne Router).</p>
+    <h3>Cisco Switch &#8211; VLAN konfigurieren</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">VLANs erstellen und benennen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">enable
+configure terminal
+vlan <span class="placeholder">&lt;100&gt;</span>
+ name <span class="placeholder">&lt;HR&gt;</span>
+vlan <span class="placeholder">&lt;200&gt;</span>
+ name <span class="placeholder">&lt;PROD&gt;</span>
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Access Port einem VLAN zuweisen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface fastEthernet <span class="placeholder">&lt;0/1&gt;</span>
+ switchport mode access
+ switchport access vlan <span class="placeholder">&lt;100&gt;</span>
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Trunk Port konfigurieren (zwischen Switches)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface fastEthernet <span class="placeholder">&lt;0/24&gt;</span>
+ switchport mode trunk
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">VLANs und Ports pruefen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show vlan brief
+show interfaces trunk</div>
+    </div>
+    <table class="data-table">
+      <tr><th>Port-Typ</th><th>Funktion</th><th>VLAN-Tag</th></tr>
+      <tr><td>Access Port</td><td>Verbindet Endgeraet (PC/Server)</td><td>ohne Tag</td></tr>
+      <tr><td>Trunk Port</td><td>Verbindet Switches/Router</td><td>mit 802.1q Tag</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s-8021q">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">Inter-VLAN Routing &#8211; IEEE 802.1q (Router-on-a-Stick)</span>
+    <span class="section-parent">OSI Layer 2</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p>Router-Subinterfaces leiten Verkehr zwischen VLANs weiter. Physischer Port zum Switch = Trunk.</p>
+    <h3>Beispiel: VLAN 100 (HR) + VLAN 200 (PROD)</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Physisches Interface aktivieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface gi0/0
+ no shutdown
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Subinterface VLAN 100 (HR) konfigurieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface gi0/0.<span class="placeholder">&lt;100&gt;</span>
+ encapsulation dot1q <span class="placeholder">&lt;100&gt;</span>
+ ip address <span class="placeholder">&lt;192.168.1.1&gt;</span> <span class="placeholder">&lt;255.255.255.128&gt;</span>
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Subinterface VLAN 200 (PROD) konfigurieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface gi0/0.<span class="placeholder">&lt;200&gt;</span>
+ encapsulation dot1q <span class="placeholder">&lt;200&gt;</span>
+ ip address <span class="placeholder">&lt;192.168.1.129&gt;</span> <span class="placeholder">&lt;255.255.255.128&gt;</span>
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Route pruefen (von PC: zeigt Hop ueber Router)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">tracert <span class="placeholder">&lt;ziel-ip&gt;</span>       (Windows)
+traceroute <span class="placeholder">&lt;ziel-ip&gt;</span>   (Linux/Cisco)</div>
+    </div>
+    <div class="note">Switch &#8594; Router: Trunk konfigurieren! Verkehr: VLAN100 &#8594; Router Subinterface .100 &#8594; .200 &#8594; VLAN200</div>
+  </div>
+</div>
+
+<div class="section" id="s-stp">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">Spanning Tree Protocol (STP)</span>
+    <span class="section-parent">OSI Layer 2</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p><strong>STP (IEEE 802.1D)</strong>: Verhindert Schleifen in geswitchten Netzwerken durch Blockieren redundanter Ports.</p>
+    <h3>Port-Zustaende</h3>
+    <table class="data-table">
+      <tr><th>Zustand</th><th>Bedeutung</th></tr>
+      <tr><td style="color:#27ae60">Root FWD</td><td>Root-Switch Port, forwarding</td></tr>
+      <tr><td style="color:#27ae60">DESG FWD</td><td>Designated Port, forwarding</td></tr>
+      <tr><td style="color:#e74c3c">ALTN BLK</td><td>Alternativer Port, blockiert (verhindert Schleife)</td></tr>
+      <tr><td style="color:#f39c12">Learning</td><td>Uebergangsphase (~15 Sek) vor Forwarding</td></tr>
+    </table>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">STP-Status anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show spanning-tree</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Port-Status + Speed/Duplex</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show interfaces fa<span class="placeholder">&lt;0/1&gt;</span></div>
+    </div>
+    <div class="note">Bei Link-Ausfall: STP aktiviert blockierten ALTN-Port nach ~30 Sek. (Convergence)</div>
+    <div class="warn">&#9888;&#65039; Speed/Duplex-Mismatch (z.B. PC: 10M HalfDuplex &#8596; Switch: 100M FullDuplex) &#8594; kein Ping! Auto-Negotiation verwenden.</div>
+  </div>
+</div>
+
+<div class="section" id="s-etherchannel">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">Etherchannel (LACP &#8211; Link Aggregation)</span>
+    <span class="section-parent">OSI Layer 2</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p><strong>Etherchannel</strong> = mehrere physische Links &#8594; 1 logischer Link. Protokoll: LACP (IEEE 802.3ad). Gibt Redundanz + mehr Bandbreite.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Etherchannel konfigurieren (LACP)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface range fa<span class="placeholder">&lt;0/1-2&gt;</span>
+ channel-group <span class="placeholder">&lt;1&gt;</span> mode active
+exit
+interface port-channel <span class="placeholder">&lt;1&gt;</span>
+ switchport mode trunk
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Etherchannel Status pruefen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show etherchannel summary</div>
+    </div>
+    <div class="note">LACP: <strong>active</strong> = sendet LACP-Pakete | <strong>passive</strong> = wartet. Mindestens eine Seite muss active sein.</div>
+  </div>
+</div>
+
+<div class="section" id="s-fehlersuche2">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">Fehlersuche Layer 1 &amp; Layer 2</span>
+    <span class="section-parent">OSI Layer 2</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <div class="note">Fehler NUR auf Netzwerkkarten, VLANs, Ports &#8211; NICHT auf Routern/Switches selbst. SOLL-Zustand = Layout-Notizen.</div>
+    <h3>Diagnose-Befehle (Cisco Switch)</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Port-Status, Speed, Duplex</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show interfaces <span class="placeholder">&lt;fa0/1&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">VLAN-Zuweisungen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show vlan brief</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">STP-Status (blockierte Ports?)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show spanning-tree</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">MAC-Tabelle pruefen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show mac address-table</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OSI LAYER 3 ===== -->
+
+<div class="section open" id="s-subnetting">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">Subnetting (VLSM)</span>
+    <span class="section-parent">OSI Layer 3</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>Pruefungsaufgabe: 50.5.10.0/24 &#8594; 4 Subnetze</h3>
+    <table class="data-table">
+      <tr><th>Netzwerk</th><th>Hosts (min.)</th><th>Praefix</th><th>Netzadresse</th><th>Maske</th><th>GW</th><th>Broadcast</th></tr>
+      <tr><td>Engineering</td><td>&#8805;120</td><td>/25</td><td>50.5.10.0</td><td>255.255.255.128</td><td>50.5.10.1</td><td>50.5.10.127</td></tr>
+      <tr><td>Buchhaltung</td><td>&#8805;40</td><td>/26</td><td>50.5.10.128</td><td>255.255.255.192</td><td>50.5.10.129</td><td>50.5.10.191</td></tr>
+      <tr><td>Personal</td><td>&#8805;20</td><td>/27</td><td>50.5.10.192</td><td>255.255.255.224</td><td>50.5.10.193</td><td>50.5.10.223</td></tr>
+      <tr><td>Management</td><td>&#8805;10</td><td>/28</td><td>50.5.10.224</td><td>255.255.255.240</td><td>50.5.10.225</td><td>50.5.10.239</td></tr>
+    </table>
+    <h3>VLSM Vorgehen (groesstes Netz zuerst!)</h3>
+    <ul>
+      <li>Hosts = 2^(32&#8722;Praefix) &#8722; 2</li>
+      <li>GW = Netzadresse + 1</li>
+      <li>Broadcast = Netzadresse + Blockgroesse &#8722; 1</li>
+      <li>Naechstes Netz = Broadcast + 1</li>
+    </ul>
+    <h3>Subnetzmasken-Tabelle</h3>
+    <table class="subnet-table">
+      <tr><th>/</th><th>Maske</th><th>Hosts</th><th>/</th><th>Maske</th><th>Hosts</th></tr>
+      <tr><td>/24</td><td>255.255.255.0</td><td>254</td><td>/28</td><td>255.255.255.240</td><td>14</td></tr>
+      <tr><td>/25</td><td>255.255.255.128</td><td>126</td><td>/29</td><td>255.255.255.248</td><td>6</td></tr>
+      <tr><td>/26</td><td>255.255.255.192</td><td>62</td><td>/30</td><td>255.255.255.252</td><td>2</td></tr>
+      <tr><td>/27</td><td>255.255.255.224</td><td>30</td><td>/23</td><td>255.255.254.0</td><td>510</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section" id="s-ippaket">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">Aufbau IP-Paket (IPv4 Header)</span>
+    <span class="section-parent">OSI Layer 3</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <table class="data-table">
+      <tr><th>Feld</th><th>Bits</th><th>Bedeutung</th></tr>
+      <tr><td>Version</td><td>4</td><td>IPv4 = 4, IPv6 = 6</td></tr>
+      <tr><td>IHL</td><td>4</td><td>Header-Laenge (min. 5 = 20 Byte)</td></tr>
+      <tr><td>TTL</td><td>8</td><td>Time to Live &#8211; wird je Hop um 1 verringert &#8594; verhindert Endlosschleifen</td></tr>
+      <tr><td>Protocol</td><td>8</td><td>6=TCP, 17=UDP, 1=ICMP</td></tr>
+      <tr><td>Source IP</td><td>32</td><td>Quell-IP-Adresse</td></tr>
+      <tr><td>Destination IP</td><td>32</td><td>Ziel-IP-Adresse</td></tr>
+      <tr><td>Flags</td><td>3</td><td>DF = Don't Fragment, MF = More Fragments</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section open" id="s-cmds">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">Standard Netzwerk-Befehle (Windows &amp; Linux)</span>
+    <span class="section-parent">OSI Layer 3</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>Windows</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Vollstaendige IP-Konfiguration anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ipconfig /all</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Verbindung testen (ICMP Ping)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ping <span class="placeholder">&lt;ziel-ip oder hostname&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Hops zum Ziel anzeigen (Traceroute) [Windows]</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">tracert <span class="placeholder">&lt;ziel oder hostname&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">DNS-Auflosung pruefen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">nslookup <span class="placeholder">&lt;www.gibb.ch&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Routing-Tabelle anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">netstat -rn</div>
+    </div>
+    <h3>Linux (Ubuntu)</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">IP-Adressen anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ip addr
+ip addr show <span class="placeholder">&lt;eth0&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Traceroute (Linux &#8211; NICHT tracert!)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">traceroute <span class="placeholder">&lt;ziel&gt;</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Routing-Tabelle anzeigen (Linux)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ip route</div>
+    </div>
+    <div class="warn">&#9888;&#65039; Windows = <code>tracert</code> | Linux = <code>traceroute</code></div>
+  </div>
+</div>
+
+<div class="section" id="s-statrouting">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">Statisches Routing</span>
+    <span class="section-parent">OSI Layer 3</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Statische Route setzen (Cisco)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ip route <span class="placeholder">&lt;zielnetz&gt;</span> <span class="placeholder">&lt;subnetzmaske&gt;</span> <span class="placeholder">&lt;next-hop-ip&gt;</span>
+! Beispiel:
+ip route 192.168.3.0 255.255.255.0 10.0.0.2</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Routing-Tabelle anzeigen (Cisco)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show ip route</div>
+    </div>
+    <h3>Routing-Tabelle Symbole</h3>
+    <table class="data-table">
+      <tr><th>Symbol</th><th>Bedeutung</th></tr>
+      <tr><td>C</td><td>Connected (direkt verbunden)</td></tr>
+      <tr><td>S</td><td>Static (statische Route)</td></tr>
+      <tr><td>R</td><td>RIP</td></tr>
+      <tr><td>O</td><td>OSPF</td></tr>
+      <tr><td>B</td><td>BGP</td></tr>
+    </table>
+    <div class="warn">&#9888;&#65039; Statische Route muss in BEIDE Richtungen konfiguriert werden! Fehlt eine Richtung &#8594; Ping geht weg, kommt aber nicht zurueck.</div>
+    <div class="warn">&#9888;&#65039; Kein Failover bei Link-Ausfall! &#8594; Dann dynamisches Routing (RIP/OSPF) nutzen.</div>
+    <p><strong>Peer-to-Peer Netz:</strong> /30 = nur 2 Host-IPs &#8594; ideal fuer Router-zu-Router Links.</p>
+  </div>
+</div>
+
+<div class="section" id="s-rip">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">Dynamisches Routing &#8211; RIP</span>
+    <span class="section-parent">OSI Layer 3</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p><strong>RIP</strong> = Routing Information Protocol (dynamisch, Distance-Vector). Max. 15 Hops, Konvergenz ~30 Sek.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">RIP konfigurieren (Cisco)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">router rip
+ version 2
+ network <span class="placeholder">&lt;netzadresse-1&gt;</span>
+ network <span class="placeholder">&lt;netzadresse-2&gt;</span>
+ no auto-summary
+exit</div>
+    </div>
+    <div class="success">&#10003; RIP: Bei Link-Ausfall &#8594; automatischer Failover ueber alternative Route!</div>
+    <table class="data-table">
+      <tr><th></th><th>Statisch</th><th>RIP</th><th>OSPF</th></tr>
+      <tr><td>Failover</td><td>&#10007; Kein</td><td>&#10003; ~30 Sek</td><td>&#10003; schnell</td></tr>
+      <tr><td>Max. Hops</td><td>&#8211;</td><td>15</td><td>unbegrenzt</td></tr>
+      <tr><td>Skalierbar</td><td>klein</td><td>mittel</td><td>gross</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section open" id="s-ospf">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">Dynamisches Routing &#8211; OSPF</span>
+    <span class="section-parent">OSI Layer 3</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p><strong>OSPF</strong> = Open Shortest Path First (Link-State, schnell, skalierbar). Area 0 = Backbone.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">OSPF konfigurieren (Beispiel Router Fribourg)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">router ospf 1
+ router-id <span class="placeholder">&lt;192.168.17.1&gt;</span>
+ log-adjacency-changes
+ network <span class="placeholder">&lt;192.168.17.1&gt;</span> 0.0.0.0 area 0
+ network <span class="placeholder">&lt;192.168.1.1&gt;</span> 0.0.0.0 area 0
+ network <span class="placeholder">&lt;192.168.1.10&gt;</span> 0.0.0.0 area 0
+!</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">OSPF-Nachbarn anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show ip ospf neighbor</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Interfaces + IPs anzeigen (Kurzform)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show ip int brief</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Routing-Tabelle (O = OSPF-Route)</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show ip route</div>
+    </div>
+    <h3>OSPF Neighbor States</h3>
+    <table class="data-table">
+      <tr><th>State</th><th>Bedeutung</th></tr>
+      <tr><td style="color:#27ae60">FULL/DR</td><td>Designated Router, vollstaendig synchronisiert &#10003;</td></tr>
+      <tr><td style="color:#27ae60">FULL/BDR</td><td>Backup Designated Router &#10003;</td></tr>
+      <tr><td style="color:#f39c12">2WAY</td><td>Bidirektionale Verbindung, kein DR/BDR</td></tr>
+    </table>
+    <div class="note">Wildcard-Maske 0.0.0.0 = nur diese exakte Host-IP wird in OSPF eingetragen (sicherster Weg).</div>
+  </div>
+</div>
+
+<div class="section" id="s-vyos">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">vyOS Router &#8211; Konfiguration</span>
+    <span class="section-parent">OSI Layer 3</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>Netzwerk-Uebersicht (vmLR1)</h3>
+    <table class="data-table">
+      <tr><th>Interface</th><th>IP</th><th>MAC</th></tr>
+      <tr><td>LAN (eth0)</td><td>192.168.110.9/24</td><td>00:50:56:00:24:09</td></tr>
+      <tr><td>LAN1 (eth1)</td><td>192.168.111.1/24</td><td>00:50:56:01:24:01</td></tr>
+      <tr><td>LAN2 (eth2)</td><td>192.168.112.1/24</td><td>00:50:56:02:24:01</td></tr>
+    </table>
+    <div class="warn">&#9888;&#65039; Interface-Namen (eth0/1/2) anhand MAC-Adresse verifizieren &#8211; koennen variieren!</div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Konfigurationsmodus + Interface setzen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">config
+set interfaces ethernet <span class="placeholder">&lt;eth1&gt;</span> address <span class="placeholder">&lt;192.168.111.1/24&gt;</span>
+set interfaces ethernet <span class="placeholder">&lt;eth2&gt;</span> address <span class="placeholder">&lt;192.168.112.1/24&gt;</span>
+commit
+save
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">DHCP-Scope auf vyOS konfigurieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">set service dhcp-server shared-network-name <span class="placeholder">&lt;LAN2&gt;</span> subnet <span class="placeholder">&lt;192.168.112.0/24&gt;</span> range 0 start <span class="placeholder">&lt;192.168.112.100&gt;</span>
+set service dhcp-server shared-network-name <span class="placeholder">&lt;LAN2&gt;</span> subnet <span class="placeholder">&lt;192.168.112.0/24&gt;</span> range 0 stop <span class="placeholder">&lt;192.168.112.200&gt;</span>
+set service dhcp-server shared-network-name <span class="placeholder">&lt;LAN2&gt;</span> subnet <span class="placeholder">&lt;192.168.112.0/24&gt;</span> default-router <span class="placeholder">&lt;192.168.112.1&gt;</span>
+commit
+save</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">DHCP-Leases anzeigen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">show dhcp server leases</div>
+    </div>
+    <h3>OPNsense Firewall &#8211; Checkliste fuer LAN1/LAN2</h3>
+    <ol>
+      <li>Internet Gateway anlegen</li>
+      <li>Statische Routen fuer LAN1/LAN2 via vyOS</li>
+      <li>Aliases fuer LAN1_Net / LAN2_Net</li>
+      <li>Firewall Rules &#8594; LAN1/LAN2 erlauben</li>
+      <li>Outbound NAT &#8594; LAN1/LAN2 &#8594; Internet</li>
+      <li>DNS Whitelist &#8594; LAN1/LAN2 eintragen</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ===== OSI LAYER 4-7 ===== -->
+
+<div class="section open" id="s-tcpudp">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-layer">L4</span>
+    <span class="section-title">TCP vs. UDP</span>
+    <span class="section-parent">OSI Layer 4&#8211;7</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <table class="data-table">
+      <tr><th></th><th>TCP</th><th>UDP</th></tr>
+      <tr><td>Verbindung</td><td>Verbindungsorientiert (3-Way-Handshake)</td><td>Verbindungslos</td></tr>
+      <tr><td>Zuverlaessigkeit</td><td>&#10003; ACK, Fehlerkorrektur, Reihenfolge</td><td>&#10007; Kein ACK</td></tr>
+      <tr><td>Geschwindigkeit</td><td>Langsamer</td><td>Schneller</td></tr>
+      <tr><td>Einsatz</td><td>HTTP, HTTPS, SSH, FTP, SMTP</td><td>DNS, DHCP, VoIP, Streaming</td></tr>
+      <tr><td>PDU</td><td>Segment</td><td>Datagramm</td></tr>
+    </table>
+    <h3>3-Way-Handshake (TCP)</h3>
+    <div class="cmd-code" style="background: var(--code-bg); padding:10px; border-radius:6px; font-family: var(--font-mono); font-size:12px;">Client -&#8594; SYN     -&#8594; Server
+Client &#8592;- SYN-ACK &#8592;- Server
+Client -&#8594; ACK     -&#8594; Server</div>
+    <h3>Wichtige Port-Nummern</h3>
+    <table class="data-table">
+      <tr><th>Port</th><th>Protokoll</th><th>Typ</th></tr>
+      <tr><td>21</td><td>FTP</td><td>TCP</td></tr>
+      <tr><td>22</td><td>SSH</td><td>TCP</td></tr>
+      <tr><td>25</td><td>SMTP</td><td>TCP</td></tr>
+      <tr><td>53</td><td>DNS</td><td>UDP/TCP</td></tr>
+      <tr><td>67/68</td><td>DHCP</td><td>UDP</td></tr>
+      <tr><td>80</td><td>HTTP</td><td>TCP</td></tr>
+      <tr><td>443</td><td>HTTPS</td><td>TCP</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section open" id="s-dhcp">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-basic">BASIC</span>
+    <span class="section-title">DHCP &amp; DNS</span>
+    <span class="section-parent">OSI Layer 4&#8211;7</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>DHCP DORA-Ablauf (laeuft ueber UDP Port 67/68)</h3>
+    <div class="cmd-code" style="background: var(--code-bg); padding:10px; border-radius:6px; font-family: var(--font-mono); font-size:12px;">Client -&#8594; DISCOVER (Broadcast, ff:ff:ff:ff:ff:ff) -&#8594; Server
+Client &#8592;- OFFER                                    &#8592;- Server
+Client -&#8594; REQUEST  (Broadcast)                     -&#8594; Server
+Client &#8592;- ACK                                      &#8592;- Server</div>
+    <div class="success">&#10003; DHCP Request = UDP (kein TCP!)</div>
+    <h3>Windows DHCP-Befehle</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">DHCP-Adresse freigeben</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ipconfig /release</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Neue DHCP-Adresse anfordern</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ipconfig /renew</div>
+    </div>
+    <h3>DNS-Test</h3>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Hostname zu IP aufloesen</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">nslookup <span class="placeholder">&lt;www.gibb.ch&gt;</span>
+ping <span class="placeholder">&lt;pc-stefan&gt;</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="s-dhcprelay">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-adv">ADV</span>
+    <span class="section-title">DHCP Relay (IP Helper)</span>
+    <span class="section-parent">OSI Layer 4&#8211;7</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <p><strong>DHCP Relay</strong>: Router leitet DHCP-Broadcasts als Unicast an DHCP-Server weiter. Noetig wenn DHCP-Server und Clients in verschiedenen Subnetzen/Standorten sind.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">IP Helper auf Cisco Router konfigurieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface <span class="placeholder">&lt;fastEthernet 0/0&gt;</span>
+ ip helper-address <span class="placeholder">&lt;dhcp-server-ip&gt;</span>
+exit</div>
+    </div>
+    <div class="note">Ablauf: PC &#8594; DHCP Broadcast &#8594; Router (ip helper) &#8594; Unicast &#8594; DHCP-Server &#8594; Router &#8594; PC</div>
+  </div>
+</div>
+
+<!-- ===== PRUEFUNGSVORBEREITUNG ===== -->
+
+<div class="section open" id="s-pruef1">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-badge badge-pruef">PRUEFUNG</span>
+    <span class="section-title">Pruefungsvorbereitung Teil 1 &#8211; Inter-VLAN Routing</span>
+    <span class="section-parent">Pruefungsvorbereitung</span>
+    <span class="section-arrow">&#9658;</span>
+  </div>
+  <div class="section-body">
+    <h3>LAB 1: Layer-3-Switch mit SVI (Switch Virtual Interface)</h3>
+    <p>PC0 (VLAN10, 192.168.10.11/24, GW .1) &#8596; PC1 (VLAN20, 192.168.20.11/24, GW .1) ueber Layer-3-Switch</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Layer-3-Switch: VLANs + Routing + SVI konfigurieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">! VLANs erstellen
+vlan 10
+vlan 20
+
+! IP-Routing aktivieren (Layer 3!)
+ip routing
+
+! SVI fuer VLAN 10
+interface vlan 10
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+exit
+
+! SVI fuer VLAN 20
+interface vlan 20
+ ip address 192.168.20.1 255.255.255.0
+ no shutdown
+exit
+
+! Access Ports zuweisen
+interface fa0/1
+ switchport mode access
+ switchport access vlan 10
+exit
+interface fa0/2
+ switchport mode access
+ switchport access vlan 20
+exit</div>
+    </div>
+
+    <h3>LAB 2: Router-on-a-Stick (Subinterfaces auf Router)</h3>
+    <p>PC0 (VLAN10) &#8596; PC1 (VLAN20) ueber Router. Switch hat Trunk auf fa0/24 zum Router.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Router: Physisches Interface + Subinterfaces konfigurieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">! Physisches Interface aktivieren
+interface GigabitEthernet0/0/0
+ no shutdown
+exit
+
+! Subinterface VLAN 10
+interface GigabitEthernet0/0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+exit
+
+! Subinterface VLAN 20
+interface GigabitEthernet0/0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Switch: Trunk Port zum Router konfigurieren</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">interface fa0/24
+ switchport mode trunk
+exit</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-desc">Verifikation: Ping + Routing-Tabelle</span><button class="copy-btn" onclick="copyCmd(this)">Kopieren</button></div>
+      <div class="cmd-code">ping 192.168.20.11      (von PC0 auf PC1)
+show ip route           (auf Router)
+show vlan brief         (auf Switch)</div>
+    </div>
+    <h3>Unterschied Lab 1 vs Lab 2</h3>
+    <table class="data-table">
+      <tr><th></th><th>Lab 1 (L3-Switch SVI)</th><th>Lab 2 (Router-on-a-Stick)</th></tr>
+      <tr><td>Geraet</td><td>Layer-3-Switch</td><td>Router + Switch</td></tr>
+      <tr><td>Routing</td><td>ip routing auf Switch</td><td>Subinterfaces auf Router</td></tr>
+      <tr><td>Trunk</td><td>keiner noetig</td><td>Switch &#8594; Router Trunk</td></tr>
+      <tr><td>Befehl</td><td>interface vlan X</td><td>encapsulation dot1Q X</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== KONTROLLLISTE ===== -->
+
+<div id="control-list" id="s-kontroll">
+  <h2>&#128203; Kontrollliste &#8211; Ausgelesene Auftraege</h2>
+  <table class="data-table" style="margin-top:10px">
+    <tr><th>Auftrag</th><th>URL-ID</th><th>Status</th><th>Anmerkung</th></tr>
+    <tr><td>BASIC: Netzwerkkarten aendern</td><td>6318</td><td class="status-ok">&#10003; Vollstaendig</td><td>Win/Linux/vyOS Befehle</td></tr>
+    <tr><td>ADV: IP Adressierung</td><td>6319</td><td class="status-ok">&#10003; Vollstaendig</td><td>Subnetting-Aufgabe + Loesung</td></tr>
+    <tr><td>BASIC: OSI- und TCP/IP Modell</td><td>6320</td><td class="status-ok">&#10003; Vollstaendig</td><td>Alle 7 Layer + Zuordnung</td></tr>
+    <tr><td>BASIC/ADV: Wireshark Analysen</td><td>6321</td><td class="status-warn">&#9888; Teilweise</td><td>Detailbefehle in docx-Anhang (nicht abrufbar)</td></tr>
+    <tr><td>ADV: Protokolle</td><td>6322</td><td class="status-ok">&#10003; Vollstaendig</td><td>DHCP DORA + Wireshark-Fragen</td></tr>
+    <tr><td>ADV: Fehlersuche Grundlagen</td><td>6323</td><td class="status-ok">&#10003; Vollstaendig</td><td>9 Fehlerszenarien</td></tr>
+    <tr><td>OSI Layer 1</td><td>6324</td><td class="status-ok">&#10003; Vollstaendig</td><td>Kabel, Glasfaser, Layer-1-Konfig</td></tr>
+    <tr><td>Layer 2: BASIC: ARP Auflosung</td><td>6326</td><td class="status-ok">&#10003; Vollstaendig</td><td></td></tr>
+    <tr><td>Layer 2: BASIC: ARP Tabelle</td><td>6327</td><td class="status-ok">&#10003; Vollstaendig</td><td>Cisco Switch Befehle</td></tr>
+    <tr><td>Layer 2: BASIC: VLAN und TRUNK Ports</td><td>6328</td><td class="status-ok">&#10003; Vollstaendig</td><td></td></tr>
+    <tr><td>Layer 2: ADV: VLAN mit IEEE802.1q/p</td><td>6329</td><td class="status-ok">&#10003; Vollstaendig</td><td>Router-on-a-Stick</td></tr>
+    <tr><td>Layer 2: BASIC: Spanning Tree</td><td>6330</td><td class="status-ok">&#10003; Vollstaendig</td><td></td></tr>
+    <tr><td>Layer 2: ADV: Etherchannel</td><td>6331</td><td class="status-ok">&#10003; Vollstaendig</td><td>LACP</td></tr>
+    <tr><td>Layer 2: ADV: Fehlersuche L1/L2</td><td>6332</td><td class="status-ok">&#10003; Vollstaendig</td><td>5 Fehlerszenarien</td></tr>
+    <tr><td>Layer 3: ADV: Subnetting</td><td>7146</td><td class="status-ok">&#10003; Vollstaendig</td><td>VLSM-Aufgabe + Loesung</td></tr>
+    <tr><td>Layer 3: BASIC: Aufbau IP Paket</td><td>6334</td><td class="status-ok">&#10003; Vollstaendig</td><td>IPv4-Header-Felder</td></tr>
+    <tr><td>Layer 3: BASIC: Standard Befehle</td><td>6335</td><td class="status-ok">&#10003; Vollstaendig</td><td>Win + Linux Befehle</td></tr>
+    <tr><td>Layer 3: BASIC: Statisches Routing</td><td>6336</td><td class="status-ok">&#10003; Vollstaendig</td><td></td></tr>
+    <tr><td>Layer 3: BASIC: Dynamisches Routing mit RIP</td><td>6337</td><td class="status-ok">&#10003; Vollstaendig</td><td></td></tr>
+    <tr><td>Layer 3: ADV: Dynamisches Routing mit OSPF</td><td>6338</td><td class="status-ok">&#10003; Vollstaendig</td><td>Konfig + show-Befehle</td></tr>
+    <tr><td>Layer 3: ADV: vyOS Router</td><td>6339</td><td class="status-ok">&#10003; Vollstaendig</td><td>inkl. OPNsense FW-Checkliste</td></tr>
+    <tr><td>Layer 4-7: BASIC: TCP / UDP</td><td>6341</td><td class="status-warn">&#9888; Minimal</td><td>Nur Video-Link, kein Textinhalt</td></tr>
+    <tr><td>Layer 4-7: BASIC: DHCP auf vmLF1</td><td>6342</td><td class="status-ok">&#10003; Vollstaendig</td><td></td></tr>
+    <tr><td>Layer 4-7: BASIC: DHCP &amp; DNS</td><td>6343</td><td class="status-ok">&#10003; Vollstaendig</td><td>Cisco PT Aufbau</td></tr>
+    <tr><td>Layer 4-7: ADV: DHCP Relay</td><td>6344</td><td class="status-ok">&#10003; Vollstaendig</td><td>IP Helper</td></tr>
+    <tr><td>Layer 4-7: ADV: DHCP auf vyOS Router</td><td>6345</td><td class="status-ok">&#10003; Vollstaendig</td><td>vyOS DHCP-Scope</td></tr>
+    <tr><td>Pruefungsvorbereitung: Teil 1</td><td>7564</td><td class="status-ok">&#10003; Vollstaendig</td><td>Lab 1 (SVI) + Lab 2 (Subinterfaces)</td></tr>
+  </table>
+  <p style="margin-top:12px; font-size:12px; color:var(--text2)">
+    &#9888; = Inhalt war hinter externem Dateianhang (docx/pkt) oder hatte nur Video-Links. Diese Inhalte konnten nicht direkt ausgelesen werden.
+  </p>
+</div>
+
+</main>
+</div><!-- end layout -->
+
+<script>
+// ===== TOGGLE SECTION =====
+function toggleSection(header) {
+  var section = header.parentElement;
+  section.classList.toggle('open');
+}
+
+// ===== COPY BUTTON =====
+function copyCmd(btn) {
+  var code = btn.closest('.cmd-block').querySelector('.cmd-code');
+  var text = code.innerText;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Kopiert!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 1500);
+    });
+  } else {
+    // Fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Kopiert!';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 1500);
+  }
+}
+
+// ===== LIVE SEARCH =====
+var searchInput = document.getElementById('search');
+var sections = document.querySelectorAll('.section');
+var countEl = document.getElementById('search-count');
+
+searchInput.addEventListener('input', function() {
+  var q = searchInput.value.trim().toLowerCase();
+  var visible = 0;
+  sections.forEach(function(sec) {
+    if (!q) {
+      sec.classList.remove('hidden');
+      visible++;
+    } else {
+      var text = sec.innerText.toLowerCase();
+      if (text.indexOf(q) !== -1) {
+        sec.classList.remove('hidden');
+        sec.classList.add('open');
+        visible++;
+      } else {
+        sec.classList.add('hidden');
+      }
+    }
+  });
+  countEl.textContent = q ? (visible + ' Abschnitt' + (visible !== 1 ? 'e' : '') + ' gefunden') : '';
+});
+
+// ===== EXPAND / COLLAPSE ALL =====
+document.getElementById('btn-expand-all').addEventListener('click', function() {
+  sections.forEach(function(s) { if (!s.classList.contains('hidden')) s.classList.add('open'); });
+});
+document.getElementById('btn-collapse-all').addEventListener('click', function() {
+  sections.forEach(function(s) { s.classList.remove('open'); });
+});
+
+// ===== SMOOTH SCROLL FOR TOC =====
+document.querySelectorAll('#toc-list a').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    var href = a.getAttribute('href');
+    var target = document.querySelector(href);
+    if (target) {
+      target.classList.add('open');
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
